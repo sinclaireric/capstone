@@ -1,5 +1,6 @@
 # Capstone Product management with CI/CD pipeline
 
+http://sinclair-capstone.s3-website.eu-central-1.amazonaws.com/
 
 
 # Functionality of the application
