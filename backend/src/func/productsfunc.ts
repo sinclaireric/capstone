@@ -86,14 +86,12 @@ export async function updateProduct(event: APIGatewayProxyEvent,
                 productId,
                 userId
             },
-            UpdateExpression: 'set #name = :n, #createdAt = :createdAt',
+            UpdateExpression: 'set #name = :n',
             ExpressionAttributeValues: {
-                ':n': updateProductRequest.name,
-                ':createdAt': updateProductRequest.createdAt,
+                ':n': updateProductRequest.name
             },
             ExpressionAttributeNames: {
                 '#name': 'name',
-                '#createdAt': 'createdAt',
             }
         }).promise();
 
