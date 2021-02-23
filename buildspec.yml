@@ -1,0 +1,29 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo go to backend
+      - cd backend
+      - echo installing backend dependencies
+      - npm install
+      - echo go to client
+      - cd ../client
+      - echo installing client dependecies
+      - npm install
+  build:
+    commands:
+      - cd ../backend
+      - echo start serveless deploy
+      - sls deploy -v
+      - cd ../client
+      - echo run testgit
+      - npm run test
+      - echo build frontend client
+      - npm run build
+
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: no
+  base-directory: fronted/build
