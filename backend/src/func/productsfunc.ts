@@ -2,7 +2,10 @@ import 'source-map-support/register';
 import * as uuid from 'uuid';
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import * as AWS  from 'aws-sdk'
-const docClient = new AWS.DynamoDB.DocumentClient()
+const AWSXRay = require('aws-xray-sdk');
+const XAWS = AWSXRay.captureAWS(AWS);
+
+const docClient = new XAWS.DynamoDB.DocumentClient();
 
 import { getUserId } from '../lambda/utils';
 import { CreateProductRequest } from '../requests/CreateProductRequest';
@@ -153,7 +156,7 @@ export async function generateUploadUrl(event: APIGatewayProxyEvent) {
     const urlExpiration = process.env.SIGNED_URL_EXPIRATION;
     const productId = event.pathParameters.productId;
 
-    const s3  = new AWS.S3({signatureVersion:'v4'})
+    const s3  = new XAWS.S3({ signatureVersion: 'v4'})
 
     const createSignedUrlRequest = {
         Bucket: bucket,
