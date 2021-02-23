@@ -19,8 +19,6 @@ phases:
       - echo start serveless deploy
       - sls deploy -v
       - cd ../client
-      - echo run testgit
-      - npm run test
       - echo build frontend client
       - npm run build
 
