@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { Link, Route, Router, Switch } from 'react-router-dom'
 import { Grid, Menu, Segment } from 'semantic-ui-react'
-
+import bg from './images/bg.png'
 import Auth from './auth/Auth'
-import { EditTodo } from './components/EditTodo'
+import { EditProduct } from './components/EditProduct'
 import { LogIn } from './components/LogIn'
 import { NotFound } from './components/NotFound'
-import { Todos } from './components/Todos'
+import { Products } from './components/Products'
 
 export interface AppProps {}
 
@@ -36,19 +36,46 @@ export default class App extends Component<AppProps, AppState> {
   render() {
     return (
       <div>
-        <Segment style={{ padding: '8em 0em' }} vertical>
-          <Grid container stackable verticalAlign="middle">
-            <Grid.Row>
-              <Grid.Column width={16}>
-                <Router history={this.props.history}>
-                  {this.generateMenu()}
 
-                  {this.generateCurrentPage()}
-                </Router>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </Segment>
+
+
+
+
+
+                  <Segment style={{ padding: '2em 0em' }} vertical>
+
+
+                      <Grid container stackable   >
+
+                          <Grid.Row columns={!this.props.auth.isAuthenticated() ? 2 : 1} >
+
+
+                              {!this.props.auth.isAuthenticated() &&
+
+                              <Grid.Column style={{padding: 50}}>
+                                  <img src={bg} style={{width: '100%', borderRadius: 16}}/>
+
+                              </Grid.Column>
+
+                              }
+
+                              <Grid.Column style={{padding:50}}>
+                                  <Router history={this.props.history}>
+                                      {/*{this.generateMenu()}*/}
+
+                                      {this.generateCurrentPage()}
+                                  </Router>
+                              </Grid.Column>
+                          </Grid.Row>
+                      </Grid>
+                  </Segment>
+
+
+
+
+
+
+
       </div>
     )
   }
@@ -93,15 +120,15 @@ export default class App extends Component<AppProps, AppState> {
           path="/"
           exact
           render={props => {
-            return <Todos {...props} auth={this.props.auth} />
+            return <Products {...props} auth={this.props.auth} />
           }}
         />
 
         <Route
-          path="/todos/:todoId/edit"
+          path="/products/:productId/edit"
           exact
           render={props => {
-            return <EditTodo {...props} auth={this.props.auth} />
+            return <EditProduct {...props} auth={this.props.auth} />
           }}
         />
 

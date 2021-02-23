@@ -5,46 +5,45 @@ import * as AWS  from 'aws-sdk'
 const docClient = new AWS.DynamoDB.DocumentClient()
 
 import { getUserId } from '../lambda/utils';
-import { CreateTodoRequest } from '../requests/CreateTodoRequest';
-import { UpdateTodoRequest } from '../requests/UpdateTodoRequest';
-import { TodoItem } from '../models/TodoItem';
+import { CreateProductRequest } from '../requests/CreateProductRequest';
+import { UpdateProductRequest } from '../requests/UpdateProductRequest';
+import { ProductItem } from '../models/ProductItem';
 
 
-export async function createTodo(event: APIGatewayProxyEvent,
-                                 createTodoRequest: CreateTodoRequest): Promise<TodoItem> {
-    const todoId = uuid.v4();
+export async function createProduct(event: APIGatewayProxyEvent,
+                                 createProductRequest: CreateProductRequest): Promise<ProductItem> {
+    const productId = uuid.v4();
     const userId = getUserId(event);
     const createdAt = new Date(Date.now()).toISOString();
 
-    const todoItem = {
+    const productItem = {
         userId,
-        todoId,
+        productId,
         createdAt,
-        done: false,
-        attachmentUrl: `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${todoId}`,
-        ...createTodoRequest
+        attachmentUrl: `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${productId}`,
+        ...createProductRequest
     };
 
 
     await docClient.put({
-        TableName: process.env.TODOS_TABLE,
-        Item: todoItem
+        TableName: process.env.PRODUCTS_TABLE,
+        Item: productItem
     }).promise();
 
 
 
-    return todoItem;
+    return productItem;
 }
 
 
 
-export async function getTodos(event: APIGatewayProxyEvent) {
+export async function getProducts(event: APIGatewayProxyEvent) {
 
 
     const userId = getUserId(event);
 
     const result = await docClient.query({
-        TableName: process.env.TODOS_TABLE,
+        TableName: process.env.PRODUCTS_TABLE,
         IndexName: process.env.INDEX_NAME,
         KeyConditionExpression: 'userId = :userId',
         ExpressionAttributeValues: {
@@ -58,11 +57,11 @@ export async function getTodos(event: APIGatewayProxyEvent) {
 
 }
 
-export async function updateTodo(event: APIGatewayProxyEvent,
-                                 updateTodoRequest: UpdateTodoRequest) {
+export async function updateProduct(event: APIGatewayProxyEvent,
+                                 updateProductRequest: UpdateProductRequest) {
 
 
-    const todoId = event.pathParameters.todoId;
+    const productId = event.pathParameters.productId;
     const userId = getUserId(event);
 
 
@@ -73,30 +72,28 @@ export async function updateTodo(event: APIGatewayProxyEvent,
 
 
         await docClient.get({
-            TableName: process.env.TODOS_TABLE,
+            TableName: process.env.PRODUCTS_TABLE,
             Key: {
-                todoId,
+                productId,
                 userId
             }
         }).promise();
 
 
         await docClient.update({
-            TableName: process.env.TODOS_TABLE,
+            TableName: process.env.PRODUCTS_TABLE,
             Key: {
-                todoId,
+                productId,
                 userId
             },
-            UpdateExpression: 'set #name = :n, #dueDate = :due, #done = :d',
+            UpdateExpression: 'set #name = :n, #createdAt = :createdAt',
             ExpressionAttributeValues: {
-                ':n': updateTodoRequest.name,
-                ':due': updateTodoRequest.dueDate,
-                ':d': updateTodoRequest.done
+                ':n': updateProductRequest.name,
+                ':createdAt': updateProductRequest.createdAt,
             },
             ExpressionAttributeNames: {
                 '#name': 'name',
-                '#dueDate': 'dueDate',
-                '#done': 'done'
+                '#createdAt': 'createdAt',
             }
         }).promise();
 
@@ -112,8 +109,8 @@ export async function updateTodo(event: APIGatewayProxyEvent,
 
 }
 
-export async function deleteTodo(event: APIGatewayProxyEvent) {
-    const todoId = event.pathParameters.todoId;
+export async function deleteProduct(event: APIGatewayProxyEvent) {
+    const productId = event.pathParameters.productId;
     const userId = getUserId(event);
 
 
@@ -121,18 +118,18 @@ export async function deleteTodo(event: APIGatewayProxyEvent) {
 
     try {
         await docClient.get({
-            TableName: process.env.TODOS_TABLE,
+            TableName: process.env.PRODUCTS_TABLE,
             Key: {
-                todoId,
+                productId,
                 userId
             }
         }).promise();
 
 
         await docClient.delete({
-            TableName: process.env.TODOS_TABLE,
+            TableName: process.env.PRODUCTS_TABLE,
             Key: {
-                todoId,
+                productId,
                 userId
             }
         }).promise();
@@ -156,13 +153,13 @@ export async function deleteTodo(event: APIGatewayProxyEvent) {
 export async function generateUploadUrl(event: APIGatewayProxyEvent) {
     const bucket = process.env.S3_BUCKET;
     const urlExpiration = process.env.SIGNED_URL_EXPIRATION;
-    const todoId = event.pathParameters.todoId;
+    const productId = event.pathParameters.productId;
 
     const s3  = new AWS.S3({signatureVersion:'v4'})
 
     const createSignedUrlRequest = {
         Bucket: bucket,
-        Key: todoId,
+        Key: productId,
         Expires: urlExpiration
     }
 

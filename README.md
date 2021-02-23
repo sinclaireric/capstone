@@ -53,7 +53,7 @@ It should return data that looks like this:
 }
 ```
 
-* `CreateTodo` - should create a new TODO for a current user. A shape of data send by a client application to this function can be found in the `CreateTodoRequest.json` file
+* `CreateTodo` - should create a new TODO for a current user. A shape of data send by a client application to this function can be found in the `CreateProductRequest.json` file
 
 It receives a new TODO item to be created in JSON format that looks like this:
 
@@ -82,7 +82,7 @@ It should return a new TODO item that looks like this:
 }
 ```
 
-* `UpdateTodo` - should update a TODO item created by a current user. A shape of data send by a client application to this function can be found in the `UpdateTodoRequest.ts` file
+* `UpdateTodo` - should update a TODO item created by a current user. A shape of data send by a client application to this function can be found in the `UpdateProductRequest.ts.ts` file
 
 It receives an object that contains three fields that can be updated in a TODO item:
 

@@ -1,21 +1,23 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "TodoItemCreate",
+    "title": "ProductItemCreate",
     "type": "object",
     "properties": {
   "name": {
     "type": "string"
-  },
-  "dueDate": {
-    "type": "string"
   }
 },
   "required": [
-  "name",
-  "dueDate"
+  "name"
 ],
     "additionalProperties": {
   "properties":{
+    "saleprice":{
+      "type":"number"
+    },
+    "suplyprice":{
+      "type":"number"
+    },
     "attachmentUrl":{
       "type":"string"
     }

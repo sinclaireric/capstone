@@ -1,31 +1,35 @@
 import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
-import {updateTodo} from "../../func/todosfunc";
-import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
+
+import { deleteProduct } from "../../func/productsfunc";
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
-
-  // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
 
 
-    const updated = await updateTodo(event, updatedTodo);
-    if (!updated) {
+
+    if (!(await deleteProduct(event))) {
         return {
             statusCode: 404,
             body: JSON.stringify({
-                error: 'Todo item does not exist'
+                error: 'Product item does not exist'
             })
         };
     }
 
     return {
-        statusCode: 200,
+        statusCode: 202,
         headers: {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Credentials': true
         },
         body: JSON.stringify({})
-    }
+    };
+
+
+
+
+
+
+
 
 }

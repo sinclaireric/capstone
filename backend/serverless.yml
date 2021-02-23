@@ -1,5 +1,5 @@
 service:
-  name: serverless-todo-app
+  name: serverless-product-app
 
 plugins:
   - serverless-webpack
@@ -13,9 +13,9 @@ provider:
   region: ${opt:region, 'eu-central-1'}
 
   environment:
-    TODOS_TABLE: todos
+    PRODUCTS_TABLE: products
     INDEX_NAME: lsi
-    S3_BUCKET: serverless-todos-files-manengsinclair-${self:provider.stage}
+    S3_BUCKET: serverless-products-files-manengsinclair-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 1000
 
 
@@ -25,13 +25,12 @@ functions:
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
 
-  # TODO: Configure this function
-  GetTodos:
-    handler: src/lambda/http/getTodos.handler
+  GetProducts:
+    handler: src/lambda/http/getProducts.handler
     events:
       - http:
           method: get
-          path: todos
+          path: products
           authorizer: Auth
           cors: true
     iamRoleStatements:
@@ -41,21 +40,21 @@ functions:
           - dynamodb:Query
         Resource:
           Fn::GetAtt:
-            - TodosDynamoDBTable
+            - ProductsDynamoDBTable
             - Arn
       - Effect: Allow
         Action:
           - dynamodb:Query
           - dynamodb:Scan
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.INDEX_NAME}
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}/index/${self:provider.environment.INDEX_NAME}
 
-  # TODO: Configure this function
-  CreateTodo:
-    handler: src/lambda/http/createTodo.handler
+  # PRODUCT: Configure this function
+  CreateProduct:
+    handler: src/lambda/http/createProduct.handler
     events:
       - http:
           method: post
-          path: todos
+          path: products
           cors: true
           authorizer: Auth
     iamRoleStatements:
@@ -64,20 +63,20 @@ functions:
           - dynamodb:PutItem
         Resource:
           Fn::GetAtt:
-            - TodosDynamoDBTable
+            - ProductsDynamoDBTable
             - Arn
     request:
       schema:
-        application/json: ${file(src/schemas/todo-item-create.json)}
+        application/json: ${file(src/schemas/product-item-create.json)}
 
 
-  # TODO: Configure this function
-  UpdateTodo:
-    handler: src/lambda/http/updateTodo.handler
+  # PRODUCT: Configure this function
+  UpdateProduct:
+    handler: src/lambda/http/updateProduct.handler
     events:
       - http:
           method: patch
-          path: todos/{todoId}
+          path: products/{productId}
           cors: true
           authorizer: Auth
     iamRoleStatements:
@@ -87,19 +86,19 @@ functions:
           - dynamodb:GetItem
         Resource:
           Fn::GetAtt:
-            - TodosDynamoDBTable
+            - ProductsDynamoDBTable
             - Arn
     request:
       schema:
-        application/json: ${file(src/schemas/todo-item-update.json
+        application/json: ${file(src/schemas/product-item-update.json
 
-  # TODO: Configure this function
-  DeleteTodo:
-    handler: src/lambda/http/deleteTodo.handler
+  # PRODUCT: Configure this function
+  DeleteProduct:
+    handler: src/lambda/http/deleteProduct.handler
     events:
       - http:
           method: delete
-          path: todos/{todoId}
+          path: products/{productId}
           cors: true
           authorize: Auth
     iamRoleStatements:
@@ -109,16 +108,16 @@ functions:
           - dynamodb:GetItem
         Resource:
           Fn::GetAtt:
-            - TodosDynamoDBTable
+            - ProductsDynamoDBTable
             - Arn
 
-  # TODO: Configure this function
+  # PRODUCT: Configure this function
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:
       - http:
           method: post
-          path: todos/{todoId}/attachment
+          path: products/{productId}/attachment
           cors: true
           authorizer: Auth
     iamRoleStatements:
@@ -130,7 +129,6 @@ functions:
 
 resources:
   Resources:
-    # TODO: Add any necessary AWS resources
     GatewayResponseDefault4XX:
       Type: AWS::ApiGateway::GatewayResponse
       Properties:
@@ -142,7 +140,7 @@ resources:
         RestApiId:
           Ref: ApiGatewayRestApi
 
-    TodosDynamoDBTable:
+    ProductsDynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
@@ -150,15 +148,15 @@ resources:
             AttributeType: S
           - AttributeName: createdAt
             AttributeType: S
-          - AttributeName: todoId
+          - AttributeName: productId
             AttributeType: S
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
-          - AttributeName: todoId
+          - AttributeName: productId
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
-        TableName: ${self:provider.environment.TODOS_TABLE}
+        TableName: ${self:provider.environment.PRODUCTS_TABLE}
         LocalSecondaryIndexes:
           - IndexName: ${self:provider.environment.INDEX_NAME}
             KeySchema:

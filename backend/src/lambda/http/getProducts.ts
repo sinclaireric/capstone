@@ -1,10 +1,9 @@
 import 'source-map-support/register'
-import {getTodos} from "../../func/todosfunc";
+import {getProducts} from "../../func/productsfunc";
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  // TODO: Get all TODO items for a current user
 
 
     return {
@@ -14,7 +13,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
             'Access-Control-Allow-Credentials': true
         },
         body: JSON.stringify({
-            items: await getTodos(event)
+            items: await getProducts(event)
         })
     };
 
