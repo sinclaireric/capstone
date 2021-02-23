@@ -3,7 +3,7 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - cd install serveless framework
+      - echo install serveless framework
       - npm install -g serverless
       - echo go to backend
       - cd backend
